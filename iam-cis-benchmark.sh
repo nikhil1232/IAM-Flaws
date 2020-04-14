@@ -110,7 +110,7 @@ fi
 echo -e "\n\n1.4 Ensure access keys are rotated every 90 days or less"
 
 usersKey1=$(cat $TEMPORARYFILE| awk -F, '{ print $1, $9 }' |grep "\ true" | awk '{ print $1 }')
-userskey2=$(cat $TEMPORARYFILE| awk -F, '{ print $1, $14 }' |grep "\ true" | awk '{ print $1 }')
+usersKey2=$(cat $TEMPORARYFILE| awk -F, '{ print $1, $14 }' |grep "\ true" | awk '{ print $1 }')
 cn1=0
 cn2=0
 if [[ $usersKey1 ]]; then
