@@ -3,6 +3,8 @@ WHITE='\033[0;37m'
 RESET='\033[0m'
 RED='\e[41;97m'
 YELLOW='\e[38;5;226m'
+TEST='\e[45m'
+YEL='\e[38;5;226m'
 
 if [[ $(ls ~/.aws/config 2>&1) == *"No such file"* ]] && [[ $(ls ~/.aws/credentials 2>&1) == *"No such file"* ]];
 then
