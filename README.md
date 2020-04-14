@@ -56,8 +56,13 @@ Below is listed a few permissions that is recommended to be set for a user befor
 
 These permissions could be set either through the awscli or directly through the console, however if you don’t provide these permissions, the script will try to enumerate as much as possible based on the permission a certain user has.
 
+
 ## Usage 
 #### <code>bash iam-flaws.sh</code>
 
 There are 3 different modules/scripts for benchmark checks, enumeration and privilege escalation respectively and all the 3 of them could be run independently, however it is highly recommended to use iam-flaws.sh directly which is kind of a central script through which you could select any of the module and it would also help in storing your output to a file.
 
+
+## Thanks 
+Thanks to Rhino Security Lab for this amazing list of 21 privilege escalation methods.
+https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/
