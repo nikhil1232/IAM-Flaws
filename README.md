@@ -65,5 +65,5 @@ There are 3 different modules/scripts for benchmark checks, enumeration and priv
 
 
 ## Thanks 
-Thanks to Rhino Security Lab for this amazing list of 21 privilege escalation methods.
+Thanks to Rhino Security Lab for this amazing list of 21 privilege escalation methods.</br>
 https://rhinosecuritylabs.com/aws/aws-privilege-escalation-methods-mitigation/
