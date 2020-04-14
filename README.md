@@ -1,9 +1,10 @@
 # IAM-Flaws
 ### AWS IAM Security Toolkit: CIS Benchmarks | Enumeration | Privilege Escalation
 
+A simple bash script that me along with my friend [Shivram Amirtha](https://github.com/shivramAG) have built that checks for misconfigurations in User and Group Policy Permissions in order to escalate privileges along with some additional features like CIS Benchmark checks and IAM Enumeration.
+
 ![Image of IAM-Flaws](https://github.com/nikhil1232/IAM-Flaws/blob/master/images/iam-flaws.png)
 
-A simple bash script that checks for misconfigurations in User and Group Policy Permissions in order to escalate privileges.
 
 **It is recommended to go through this Blog before proceeding:**</br>
 https://theblocksec.com/2020/04/14/iam-flaws-exploiting-user-and-group-policies-in-aws-iam/
