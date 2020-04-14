@@ -1,6 +1,8 @@
 # IAM-Flaws
 ## AWS IAM Security Toolkit: CIS Benchmarks | Enumeration | Privilege Escalation
 
+![Image of IAM-Flaws](https://github.com/nikhil1232/IAM-Flaws/blob/master/images/iam-flaws.png)
+
 A simple bash script that checks for misconfigurations in User and Group Policy Permissions in order to escalate privileges.
 
 **It is recommended to go through this Blog before proceeding:**</br>
@@ -9,15 +11,21 @@ https://theblocksec.com/2020/04/14/iam-flaws-exploiting-user-and-group-policies-
 As of now, the script supports the following activities:
 
 - All CIS Benchmark checks related to AWS IAM
+![Image of IAM-Cis-Benchmark Checks ](https://github.com/nikhil1232/IAM-Flaws/blob/master/images/iam-cis-benchmark.png)</br></br>
 - AWS IAM Enumeration of Users, Groups, Policies and Permissions
+![Image of IAM-Enumerate ](https://github.com/nikhil1232/IAM-Flaws/blob/master/images/iam-enumeration.png)</br></br>
 - Privilege Escalation Scanning
+![Image of IAM-Cis-Privesc Scanning ](https://github.com/nikhil1232/IAM-Flaws/blob/master/images/iam-privesc-scan.png)</br></br>
 - Privilege Escalation Exploitation
+![Image of IAM-Cis-Privesc Exploitation ](https://github.com/nikhil1232/IAM-Flaws/blob/master/images/iam-privesc-exploit.png)</br></br>
 
 ## Requirements
-#### git clone https://github.com/nikhil1232/IAM-Flaws/
-#### cd IAM-Flaws
-#### pip install -r requirements.txt
-#### apt-get install jq
+<code>git clone https://github.com/nikhil1232/IAM-Flaws/ </code>
+<code>cd IAM-Flaws</code>
+<code>pip install -r requirements.txt</code>
+<code>apt-get install jq</code>
+
+
 
 Once awscli is installed, you need to configure it using the **aws configure** by providing the access and the secret key of the IAM user.
 
