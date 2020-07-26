@@ -46,13 +46,20 @@ abc=""
 abcd=""
 
 b=$(aws iam get-user 2>&1)
-if [[ $a == *"An error"* ]]; then
-  echo -e "Failed\n"
-  (($temp+=1))
+echo -e "\n\e[30;48;5;82mGet User:${RESET}\n"
+
+if [[ $b == *"An error"* ]]; then
+  b=$(aws sts get-caller-identity 2>&1 | jq ".Arn" | cut -d "\"" -f2 | cut -d ":" -f6 | cut -d "/" -f2 | sed -r '/^\s*$/d')
+  if [[ $b == *"An error"* ]]; then
+    echo -e "Failed\n"
+    (( temp += 1 ))
+  else
+    CurrentUser=$(echo -e "$b\n")
+    echo $CurrentUser
+  fi
   
 else
-  echo -e "\n\e[30;48;5;82mGet User:${RESET}\n"
-  CurrentUser=$(echo -e "$b\n" | jq ".User.UserName" 2>&1 | cut -d "\"" -f2)
+  CurrentUser=$(echo -e "$b\n" | jq ".User.UserName" 2>&1 | cut -d "\"" -f2 | sed -r '/^\s*$/d')
   echo $CurrentUser
 
 fi
@@ -62,7 +69,7 @@ echo -e "\n\e[30;48;5;82mList Users:${RESET}\n"
 
 if [[ $a == *"An error"* ]]; then
   echo -e "Failed\n"
-  (($temp+=1))
+  (( temp += 1 ))
   if [[ $temp == 2 ]]; then
      exit 1
   fi
@@ -196,6 +203,7 @@ fi
 
 
 
+
 d=$(aws iam list-user-policies --user-name $awsuser 2>&1 | jq ".PolicyNames[]" 2>&1 | cut -d "\"" -f2)
 echo -e "\n\n\e[30;48;5;82mList User Policies:${RESET}\n"
 if [[ $d == *"error"* ]] || [[ -z $d ]]; then
@@ -205,30 +213,34 @@ else
   while IFS= read -r bu ;
   do
   e2=$(aws iam get-user-policy --user-name $awsuser --policy-name $bu 2>&1)
-  e=$(echo "$e2" | jq ".PolicyDocument.Statement[].Effect" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
-  co=0
-  echo -e "\n\n\e[30;48;5;82mGet User Policies: $bu${RESET}\n"
+  if [[ $e2 == *"error"* ]] || [[ -z $e2 ]]; then
+    echo -e "Failed\n"
+  else
+    e=$(echo "$e2" | jq ".PolicyDocument.Statement[].Effect" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
+    co=0
+    echo -e "\n\n\e[30;48;5;82mGet User Policies: $bu${RESET}\n"
 
   
-  if [[ $e == *"error"* ]] || [[ -z $e ]]; then
-   echo -e "Failed\n"
-  else
-   while IFS= read -r xyz ;
-   do
-   if [[ $xyz == *"Allow"* ]]; then
-    ei=$(echo "$e2" | jq ".PolicyDocument.Statement[$co].Action" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
-    ei2=$(echo "$e2" | jq ".PolicyDocument.Statement[$co].Resource" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
-    echo -e "\nAction:\n"
-    echo "$ei"
-    echo -e "\nResource:\n"
-    echo "$ei2"
-    abc=$(echo -e "$abc\n$ei") 
-   elif [[ $xyz == *"Deny"* ]]; then
-    ex=$(echo "$e2" | jq ".PolicyDocument.Statement[$co].Action" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
-    abcd=$(echo -e "$abcd\n$ex") 
-   fi
-  ((co+=1))
-  done <<< "$e"
+    if [[ $e == *"error"* ]] || [[ -z $e ]]; then
+     echo -e "Failed\n"
+    else
+     while IFS= read -r xyz ;
+     do
+     if [[ $xyz == *"Allow"* ]]; then
+       ei=$(echo "$e2" | jq ".PolicyDocument.Statement[$co].Action" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
+       ei2=$(echo "$e2" | jq ".PolicyDocument.Statement[$co].Resource" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
+       echo -e "\nAction:\n"
+       echo "$ei"
+       echo -e "\nResource:\n"
+       echo "$ei2"
+       abc=$(echo -e "$abc\n$ei") 
+     elif [[ $xyz == *"Deny"* ]]; then
+       ex=$(echo "$e2" | jq ".PolicyDocument.Statement[$co].Action" 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d' )
+       abcd=$(echo -e "$abcd\n$ex") 
+     fi
+     (( co += 1 ))
+     done <<< "$e"
+    fi
   fi
   done <<< "$d"
 fi
@@ -238,8 +250,7 @@ fi
 
 
 
-
-f=$(aws iam list-attached-user-policies --user-name $awsuser | jq ".AttachedPolicies[].PolicyArn" 2>&1 | cut -d "\"" -f2)
+f=$(aws iam list-attached-user-policies --user-name $awsuser 2>&1 | jq ".AttachedPolicies[].PolicyArn" 2>&1 | cut -d "\"" -f2)
 echo -e "\n\n\e[30;48;5;82mList User Attached Policies:${RESET}\n"
 if [[ $f == *"error"* ]] || [[ -z $f ]]; then
   echo -e "Failed\n"
@@ -571,11 +582,20 @@ if [[ $1 == "-e" ]]; then
 		   while IFS= read -r yu ;
 		   do
 		   echo -e "\n$yu\n"
-		   hl=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement[] | "\(.Effect) \(.Action[])"' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
-		   hm=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement[].Resource[]' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
-		   echo -e "Actions\n"
+		   hl=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement | "\(.Effect) \(.Action[])"' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
+		   he=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement.Effect' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
+                   hm=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement[].Resource[]' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
+                   if [[ $hl == *"Action"* ]]; then
+                     hl=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement[] | "\(.Effect) \(.Action[])"' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
+                   fi
+                   if [[ $he == *"Effect"* ]]; then
+		     he=$(aws iam get-policy-version --policy-arn $obj --version-id $yu 2>&1 | jq '.PolicyVersion.Document.Statement[].Effect' 2>&1 | cut -d "\"" -f2 | tr -d "[]" | sed -r '/^\s*$/d')
+                   fi
+                   echo -e "Effects:\n"
+                   echo -e "$he\n"
+                   echo -e "Actions:\n"
 		   echo -e "$hl\n"
-		   echo -e "Resources\n"
+		   echo -e "Resources:\n"
 		   echo -e "$hl\n"
 
 		   done <<< "$priv1esc"
@@ -813,5 +833,4 @@ fi
 
 echo -e "\n ${YEL}Privilege Escalation Check Complete. Thanks !!!${RESET}"
 echo -e "\n\n${YEL}==================================================================================${RESET}\n"
-
 
